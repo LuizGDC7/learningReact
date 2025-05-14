@@ -9,53 +9,54 @@ export function Square({estado, setEstado}){
 
 export function Board(){
 
-  const [estadoSquare, setEstadoSquare] = useState(Array(9).fill(""));
+  const [estadoSquare, setEstadoSquare] = useState(Array(9).fill(null));
   const [jogadaAtual, setJogadaAtual] = useState("X");
+  const [vencedor, setVencedor] = useState(null)
 
   const alterarJogadaAtual = () => {
         setJogadaAtual(prev => prev === "X" ? "O" : "X")
     }
 
+  const defineWinner = (squares) => {
 
-  const defineWinner = () => {
-    const matrix = [[estadoSquare[0], estadoSquare[1], estadoSquare[2]], [estadoSquare[3], estadoSquare[4], estadoSquare[5]], [estadoSquare[6], estadoSquare[7], estadoSquare[8]]]
+    const matrix = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [6, 4, 2]
+    ]
 
-    for(let c = 0; c < 3; c++){
-      if(matrix[c][0] === matrix[c][1] && matrix[c][1] === matrix[c][2] && matrix[c][0] != ""){
-        return [true, matrix[c][0]]
+    for(const value of matrix){
+
+      const val1 = squares[value[0]]
+      const val2 = squares[value[1]]
+      const val3 = squares[value[2]]  
+
+      if(val1 !== null && val2 !== null && val3 !== null){
+        if(val1 === val2 && val2 === val3){
+          setVencedor(val1)
+          break
+        }
       }
-
-      if(matrix[0][c] === matrix[1][c] && matrix[c][1] === matrix[2][c] && matrix[0][c] != ""){
-        return [true, matrix[0][c]]
-      }
-    }
-
-    if((matrix[0][0] === matrix[1][1] && matrix[1][1] === matrix[2][2] || matrix[2][0] == matrix[1][1] && matrix[1][1] == matrix[0][2]) && matrix[1][1] != ""){
-      return [true, matrix[1][1]]
-    }
-
-    return [false, ""]
-
+      
   }
+}
     
   const onClickChange = (index, value) => {
       
-    const novosValores = [...estadoSquare];
-      
-      if(novosValores[index] === ""){
-        novosValores[index] = value;
-        
-        setEstadoSquare(novosValores)
+    if(vencedor !== null){
+      console.log(`${vencedor} é o vencedor`)
+    }else{
 
-        const res = defineWinner()
-        if(res[0]){
-          console.log(`${jogadaAtual} é vencedor`)
+      const novosValores = [...estadoSquare];
+        
+        if(novosValores[index] === null){
+          novosValores[index] = value;
+          
+          setEstadoSquare(novosValores)
+  
+          defineWinner(novosValores)
+          
+          alterarJogadaAtual()
         }
-        
-        alterarJogadaAtual()
-
-      }
-
+    }
 
   }
     
@@ -85,6 +86,7 @@ function App() {
   
   return (
     <>
+      <div className='status'>$`{vencedor ? vencedor : ""}`</div>
       <Board></Board>
      
     </>
